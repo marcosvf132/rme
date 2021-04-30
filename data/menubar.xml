@@ -6,6 +6,7 @@
         <item name="$Save" hotkey="Ctrl+S" action="SAVE" help="Save the current map."/>
         <item name="Save $As..." hotkey="Ctrl+Alt+S" action="SAVE_AS" help="Save the current map as a new file."/>
         <item name="$Generate Map" action="GENERATE_MAP" help="Generate a new map."/>
+        <item name="$Generate House Data" action="GENERATE_HOUSE_DATA" help="Generate a new house data."/>
         <item name="$Close" hotkey="Ctrl+Q" action="CLOSE" help="Closes the currently open map."/>
         <separator/>
         <menu name="$Import">

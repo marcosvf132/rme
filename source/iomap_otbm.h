@@ -127,6 +127,9 @@ public:
 	virtual bool loadMap(Map& map, const FileName& identifier);
 	virtual bool saveMap(Map& map, const FileName& identifier);
 
+	virtual int getGeneratorHouseTilesJumps(int min_pos_x, int min_pos_y, int min_pos_z, int max_pos_x, int max_pos_y, int max_pos_z, Map& map);
+	virtual bool generateHouseData(Map& map, const FileName& identifier);
+
 protected:
 	static bool getVersionInfo(NodeFileReadHandle* f,  MapVersion& out_ver);
 

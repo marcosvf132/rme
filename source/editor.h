@@ -72,6 +72,8 @@ public: // Functions
 	void QueryNode(int ndx, int ndy, bool underground);
 	void SendNodeRequests();
 
+	// Generate house static map data
+	void generateStaticMapData(FileName filename, bool showdialog);
 
 	// Map handling
 	void saveMap(FileName filename, bool showdialog); // "" means default filename

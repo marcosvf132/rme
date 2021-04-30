@@ -136,6 +136,7 @@
 #define MAP_LOAD_FILE_WILDCARD "OpenTibia Binary Map (*.otbm)|*.otbm"
 #define MAP_SAVE_FILE_WILDCARD "OpenTibia Binary Map (*.otbm)|*.otbm"
 
+#define HOUSE_STATIC_MAP_DATA_GENERATOR "Tibia Binary Assets Dat (*.dat)|*.dat"
 // wxString conversions
 #define nstr(str) std::string((const char*)(str.mb_str(wxConvUTF8)))
 #define wxstr(str) wxString((str).c_str(), wxConvUTF8)

@@ -31,6 +31,7 @@ namespace MenuBar
 		SAVE,
 		SAVE_AS,
 		GENERATE_MAP,
+		GENERATE_HOUSE_DATA,
 		CLOSE,
 		IMPORT_MAP,
 		IMPORT_MONSTERS,
@@ -178,6 +179,7 @@ public:
 	// File Menu
 	void OnNew(wxCommandEvent& event);
 	void OnOpen(wxCommandEvent& event);
+	void OnGenerateHouseData(wxCommandEvent& event);
 	void OnGenerateMap(wxCommandEvent& event);
 	void OnOpenRecent(wxCommandEvent& event);
 	void OnSave(wxCommandEvent& event);

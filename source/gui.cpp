@@ -568,6 +568,24 @@ void GUI::SaveMap()
 	}
 }
 
+void GUI::GenerateHouseStaticData()
+{
+	if (!IsEditorOpen())
+		return;
+
+	wxFileDialog dialog(root, "Create on...", "", "", HOUSE_STATIC_MAP_DATA_GENERATOR, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+	if (dialog.ShowModal() == wxID_OK) {
+		MapTab* mapTab = GetCurrentMapTab();
+		if (mapTab) {
+			Editor* editor = mapTab->GetEditor();
+			if (editor) {
+				editor->generateStaticMapData(dialog.GetPath(), true);
+			}
+		}
+	}
+}
+
 void GUI::SaveMapAs()
 {
 	if (!IsEditorOpen())

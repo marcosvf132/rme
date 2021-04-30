@@ -176,6 +176,76 @@ void Editor::addAction(Action* action, int stacking_delay )
 	g_gui.UpdateMenus();
 }
 
+void Editor::generateStaticMapData(FileName filename, bool showdialog)
+{
+	std::string savefile = filename.GetFullPath().mb_str(wxConvUTF8).data();
+
+	if (savefile.empty()) {
+		savefile = map.filename + "-housedata";
+	}
+
+	// File object to convert between local paths etc.
+	FileName converter;
+	converter.Assign(wxstr(savefile));
+	std::string house_dat_path = nstr(converter.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
+
+	// Make temporary backups
+	//converter.Assign(wxstr(savefile));
+	std::string backup_house_dat;
+
+	if (converter.FileExists()) {
+		backup_house_dat = house_dat_path + nstr(converter.GetName()) + ".dat~";
+		std::remove(backup_house_dat.c_str());
+		std::rename(savefile.c_str(), backup_house_dat.c_str());
+	}
+
+	// Save the data
+	{
+		std::string n = nstr(g_gui.GetLocalDataDirectory()) + ".savingdata.txt";
+		std::ofstream f(n.c_str(), std::ios::trunc | std::ios::out);
+		f << backup_house_dat << std::endl;
+	}
+
+	{
+		// Set up the Data paths
+		wxFileName fn = wxstr(savefile);
+
+		g_gui.CreateLoadBar("Generating house data...");
+
+		// Perform the actual save
+		IOMapOTBM generatorData(map.getVersion());
+		bool success = generatorData.generateHouseData(map, fn);
+
+		g_gui.DestroyLoadBar();
+
+		// Check for errors...
+		if (!success) {
+			// Rename the temporary backup files back to their previous names
+			if (!backup_house_dat.empty()) {
+				converter.SetFullName(wxstr(savefile));
+				std::string house_dat_filename = house_dat_path + nstr(converter.GetName());
+				std::rename(backup_house_dat.c_str(), std::string(house_dat_filename + ".dat").c_str());
+			}
+
+			// Display the error
+			g_gui.PopupDialog("Error", "Could not generate file, unable to open target for writing.", wxOK);
+		}
+
+		// Remove temporary save runfile
+		{
+			std::string n = nstr(g_gui.GetLocalDataDirectory()) + ".savingdata.txt";
+			std::remove(n.c_str());
+		}
+
+		// If failure, don't run the rest of the function
+		if (!success)
+			return;
+	}
+
+	// Delete the temporary files
+	std::remove(backup_house_dat.c_str());
+}
+
 void Editor::saveMap(FileName filename, bool showdialog)
 {
 	std::string savefile = filename.GetFullPath().mb_str(wxConvUTF8).data();

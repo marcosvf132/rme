@@ -209,11 +209,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\source\staticmapdata.pb.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\..\source\artprovider.cpp" />
     <ClCompile Include="..\..\source\brush_tables.cpp" />
     <ClCompile Include="..\..\source\container_properties_window.cpp" />
     <ClCompile Include="..\..\source\find_item_window.cpp" />
     <ClCompile Include="..\..\source\welcome_dialog.cpp" />
+    <ClInclude Include="..\..\source\staticmapdata.pb.h" />
     <ClInclude Include="..\..\source\artprovider.h" />
     <ClInclude Include="..\..\source\main_toolbar.h" />
     <ClInclude Include="..\..\source\otml.h" />

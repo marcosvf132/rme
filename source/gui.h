@@ -316,6 +316,7 @@ public:
 	void OpenMap();
 	void SaveMap();
 	void SaveMapAs();
+	void GenerateHouseStaticData();
 	bool LoadMap(const FileName& fileName);
 
 protected:

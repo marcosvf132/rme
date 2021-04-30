@@ -47,6 +47,7 @@ public:
 	void setExit(const Position& pos);
 	void setExit(Map* map, const Position& pos);
 	Position getExit() const {return exit;}
+	PositionList getTiles() const { return tiles; }
 	uint8_t getEmptyDoorID() const;
 	Position getDoorPositionByID(uint8_t id) const;
 protected:

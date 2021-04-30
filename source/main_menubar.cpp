@@ -53,6 +53,7 @@ MainMenuBar::MainMenuBar(MainFrame *frame) : frame(frame)
 	MAKE_ACTION(SAVE, wxITEM_NORMAL, OnSave);
 	MAKE_ACTION(SAVE_AS, wxITEM_NORMAL, OnSaveAs);
 	MAKE_ACTION(GENERATE_MAP, wxITEM_NORMAL, OnGenerateMap);
+	MAKE_ACTION(GENERATE_HOUSE_DATA, wxITEM_NORMAL, OnGenerateHouseData);
 	MAKE_ACTION(CLOSE, wxITEM_NORMAL, OnClose);
 
 	MAKE_ACTION(IMPORT_MAP, wxITEM_NORMAL, OnImportMap);
@@ -315,6 +316,7 @@ void MainMenuBar::Update()
 	EnableItem(SAVE, is_host);
 	EnableItem(SAVE_AS, is_host);
 	EnableItem(GENERATE_MAP, false);
+	EnableItem(GENERATE_HOUSE_DATA, is_local);
 
 	EnableItem(IMPORT_MAP, is_local);
 	EnableItem(IMPORT_MONSTERS, is_local);
@@ -674,6 +676,11 @@ wxObject* MainMenuBar::LoadItem(pugi::xml_node node, wxMenu* parent, wxArrayStri
 void MainMenuBar::OnNew(wxCommandEvent& WXUNUSED(event))
 {
 	g_gui.NewMap();
+}
+
+void MainMenuBar::OnGenerateHouseData(wxCommandEvent& WXUNUSED(event))
+{
+	g_gui.GenerateHouseStaticData();
 }
 
 void MainMenuBar::OnGenerateMap(wxCommandEvent& WXUNUSED(event))

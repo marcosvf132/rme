@@ -37,6 +37,14 @@
 #include "iomap_otbm.h"
 #include "pugicast.h"
 
+#include <wx/datstrm.h>
+
+// Google protobuf generated code
+#include "staticmapdata.pb.h"
+#include "house.h"
+#include <fstream>
+#include <iostream>
+
 typedef uint8_t attribute_t;
 typedef uint32_t flags_t;
 
@@ -1140,6 +1148,164 @@ bool IOMapOTBM::loadHouses(Map& map, pugi::xml_document& doc)
 			warning("House %d has no town! House was removed.", house->id);
 			map.houses.removeHouse(house);
 		}
+	}
+	return true;
+}
+
+int IOMapOTBM::getGeneratorHouseTilesJumps(int min_pos_x, int min_pos_y, int min_pos_z, int max_pos_x, int max_pos_y, int max_pos_z, Map& map)
+{
+	int jumps = 0;
+	bool ignoreFirst = true;
+	for (int z_it = min_pos_z; z_it <= max_pos_z; z_it++)
+	{
+		for (int x_it = min_pos_x; x_it <= max_pos_x; x_it++)
+		{
+			for (int y_it = min_pos_y; y_it <= max_pos_y; y_it++)
+			{
+				if (ignoreFirst)
+				{
+					ignoreFirst = false;
+					continue;
+				}
+				Tile* houseTile = map.getTile(x_it, y_it, z_it);
+				if (!houseTile || (houseTile && !houseTile->ground && houseTile->empty()))
+					jumps += 1;
+				else
+					return jumps;
+			}
+		}
+	}
+	return jumps;
+}
+
+bool IOMapOTBM::generateHouseData(Map& map, const FileName& identifier)
+{
+	GOOGLE_PROTOBUF_VERIFY_VERSION;
+	protobuf::staticdata::StaticData* mapdata = new protobuf::staticdata::StaticData();
+	int percent = 0;
+	for (auto &it : map.houses) {
+		House* house = it.second;
+		percent++;
+		// Realy big houses can make the client slower and make it crash in some cases.
+		if (house == nullptr || house && house->getTiles().size() == 0 || house && house->getTiles().size() >= 2000)
+			continue;
+
+		PositionList tiles = house->getTiles();
+
+		protobuf::staticdata::StaticMapData* mapdataIt = mapdata->add_mapdata();
+		mapdataIt->set_houseid(house->id);
+
+		protobuf::staticdata::HouseData* houseData = new protobuf::staticdata::HouseData();
+
+		// Top left position
+		protobuf::staticdata::HousePositionTopLeft* housePositionTopLeft = new protobuf::staticdata::HousePositionTopLeft();
+		for (Position pos : tiles) {
+			if (!housePositionTopLeft->has_positionx() || housePositionTopLeft->positionx() > pos.x) {
+				housePositionTopLeft->set_positionx(pos.x);
+			}
+			if (!housePositionTopLeft->has_positiony() || housePositionTopLeft->positiony() > pos.y) {
+				housePositionTopLeft->set_positiony(pos.y);
+			}
+			if (!housePositionTopLeft->has_positionz() || housePositionTopLeft->positionz() > pos.z) {
+				housePositionTopLeft->set_positionz(pos.z);
+			}
+		}
+		houseData->set_allocated_topleft(housePositionTopLeft);
+
+		// House square dimensions
+		uint32_t max_pos_x = 0;
+		uint32_t max_pos_y = 0;
+		uint32_t max_pos_z = 0;
+		protobuf::staticdata::HouseSizeSquare* houseSizeSquare = new protobuf::staticdata::HouseSizeSquare();
+		for (Position pos : tiles) {
+			if (max_pos_x < pos.x) {
+				max_pos_x = pos.x;
+			}
+			if (max_pos_y < pos.y) {
+				max_pos_y = pos.y;
+			}
+			if (max_pos_z < pos.z) {
+				max_pos_z = pos.z;
+			}
+		}
+
+		houseSizeSquare->set_positionx(max_pos_x - housePositionTopLeft->positionx() + 1);
+		houseSizeSquare->set_positiony(max_pos_y - housePositionTopLeft->positiony() + 1);
+		houseSizeSquare->set_positionz(max_pos_z - housePositionTopLeft->positionz() + 1);
+		houseData->set_allocated_housesquare(houseSizeSquare);
+
+		protobuf::staticdata::HouseSerialize* houseSerialize = new protobuf::staticdata::HouseSerialize();
+		protobuf::staticdata::HouseSerializeSqm* houseSerializeSqm = new protobuf::staticdata::HouseSerializeSqm();
+		int jumps = 0;
+		int minPosX = housePositionTopLeft->positionx();
+		int minPosY = housePositionTopLeft->positiony();
+		int minPosZ = housePositionTopLeft->positionz();
+		for (int z_it = minPosZ; z_it <= max_pos_z; z_it++) {
+			for (int x_it = minPosX; x_it <= max_pos_x; x_it++) {
+				for (int y_it = minPosY; y_it <= max_pos_y; y_it++) {
+					if (jumps > 0) {
+						jumps -= 1;
+					} else {
+						Tile* houseTile = map.getTile(x_it, y_it, z_it);
+						/// This '> 100' check is used only on realy big houses where we dont want useless tiles set on it.
+						/// Removing useless sqms can make the .dat lighter and the client load it a bit faster.
+						if (houseTile && ((max_pos_x * max_pos_y * max_pos_z) >= 100 && houseTile->getHouseID() == house->id) && (houseTile->ground || !houseTile->empty())) {
+							protobuf::staticdata::SqmSerialize* sqmSerialize = houseSerializeSqm->add_sqmserialize();
+
+							// Ground
+							if (houseTile->ground) {
+								protobuf::staticdata::SqmIteratorValue* sqmIteratorValueGround = sqmSerialize->add_item();
+								sqmIteratorValueGround->set_clientid(houseTile->ground->getClientID());
+							}
+
+							// Items
+							if (!houseTile->empty()) {
+								for (Item* item : houseTile->items) {
+									protobuf::staticdata::SqmIteratorValue* sqmIteratorValue = sqmSerialize->add_item();
+									sqmIteratorValue->set_clientid(item->getClientID());
+								}
+							}
+							jumps = getGeneratorHouseTilesJumps(x_it, y_it, z_it, max_pos_x, max_pos_y, max_pos_z, map);
+							sqmSerialize->set_jumpempty(jumps);
+						} else {
+							protobuf::staticdata::SqmSerialize* sqmSerializeJump = houseSerializeSqm->add_sqmserialize();
+							protobuf::staticdata::SqmIteratorValue* sqmIteratorValueJump = sqmSerializeJump->add_item();
+							sqmIteratorValueJump->set_clientid(470);
+							jumps = getGeneratorHouseTilesJumps(x_it, y_it, z_it, max_pos_x, max_pos_y, max_pos_z, map);
+							sqmSerializeJump->set_jumpempty(jumps);
+						}
+					}
+				}
+			}
+		}
+		houseSerialize->set_allocated_housesqm(houseSerializeSqm);
+		houseData->set_allocated_serialize(houseSerialize);
+		mapdataIt->set_allocated_housedata(houseData);
+
+
+		protobuf::staticdata::House* houseInfoIt = mapdata->add_house();
+		protobuf::staticdata::HousePosition* hourDoorPosition = new protobuf::staticdata::HousePosition();
+		hourDoorPosition->set_pos_x(house->getExit().isValid() ? house->getExit().x : housePositionTopLeft->positionx() + std::floor((max_pos_x)/2));
+		hourDoorPosition->set_pos_y(house->getExit().isValid() ? house->getExit().y :  housePositionTopLeft->positiony() + std::floor((max_pos_y) / 2));
+		hourDoorPosition->set_pos_z(house->getExit().isValid() ? house->getExit().z :  housePositionTopLeft->positionz() + std::floor((max_pos_z) / 2));
+		houseInfoIt->set_allocated_houseposition(hourDoorPosition);
+		houseInfoIt->set_house_id(house->id);
+		houseInfoIt->set_name(house->name);
+		houseInfoIt->set_unknownstring(""); // Unknown string
+		houseInfoIt->set_price(house->rent);
+		houseInfoIt->set_beds(0); // To-DO
+		houseInfoIt->set_size_sqm(house->getTiles().size());
+		houseInfoIt->set_guildhall(house->guildhall);
+		houseInfoIt->set_city(map.towns.getTown(house->townid) ? map.towns.getTown(house->townid)->getName() : "none");
+		houseInfoIt->set_shop(false); // Is shop
+
+
+		g_gui.SetLoadDone(std::floor((percent * 100) / map.houses.count()));
+	}
+
+	std::fstream fo(nstr(identifier.GetFullPath()), std::ios::out | std::ios::trunc | std::ios::binary);
+	if (!mapdata->SerializeToOstream(&fo)) {
+		return false;
 	}
 	return true;
 }
