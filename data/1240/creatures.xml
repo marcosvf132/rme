@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <creatures>
+    <creature name="Brachiodemon" type="monster" looktype="1299"/>
+    <creature name="Infernal Demon" type="monster" looktype="1313"/>
+    <creature name="Infernal Phantom" type="monster" looktype="1298"/>
     <creature name="Abyssador" type="monster" looktype="495"/>
     <creature name="Achad" type="monster" looktype="146" lookhead="93" lookbody="93" looklegs="57" lookfeet="97"/>
     <creature name="Acid Blob" type="monster" looktype="314"/>
@@ -133,7 +136,7 @@
     <creature name="Deepling Spellsinger" type="monster" looktype="443"/>
     <creature name="Deepling Tyrant" type="monster" looktype="442"/>
     <creature name="Deepling Warrior" type="monster" looktype="441"/>
-    <creature name="Deepling Worker" type="monster" looktype="470"/>
+    <creature name="Deepling worker" type="monster" looktype="470"/>
     <creature name="Deer" type="monster" looktype="31"/>
     <creature name="Defiler" type="monster" looktype="238"/>
     <creature name="Demodras" type="monster" looktype="204"/>
@@ -630,7 +633,7 @@
     <creature name="Vulcongra" type="monster" looktype="509"/>
     <creature name="Wailing Widow" type="monster" looktype="347"/>
     <creature name="War Golem" type="monster" looktype="326"/>
-    <creature name="War Wolf" type="monster" looktype="3"/>
+    <creature name="War wolf" type="monster" looktype="3"/>
     <creature name="Warlock" type="monster" looktype="130" lookhead="19" lookbody="71" looklegs="128" lookfeet="128"/>
     <creature name="Warlord Ruzad" type="monster" looktype="2" lookhead="20" lookbody="30" looklegs="40" lookfeet="50"/>
     <creature name="Wasp" type="monster" looktype="44"/>
@@ -646,7 +649,7 @@
     <creature name="Wild Dog" type="monster" looktype="32" lookhead="20" lookbody="30" looklegs="40" lookfeet="50"/>
     <creature name="Wild Warrior" type="monster" looktype="131" lookhead="57" lookbody="57" looklegs="57" lookfeet="57"/>
     <creature name="Wilting Leaf Golem" type="monster" looktype="573"/>
-    <creature name="Winter Wolf" type="monster" looktype="52"/>
+    <creature name="Winter wolf" type="monster" looktype="52"/>
     <creature name="Wisp" type="monster" looktype="294"/>
     <creature name="Witch" type="monster" looktype="54"/>
     <creature name="Wolf" type="monster" looktype="27"/>
@@ -670,4 +673,4 @@
     <creature name="Zoralurk" type="monster" looktype="12" lookhead="0" lookbody="98" looklegs="86" lookfeet="94"/>
     <creature name="Zugurosh" type="monster" looktype="12" lookhead="2" lookbody="35" looklegs="57" lookfeet="91"/>
     <creature name="Zulazza the Corruptor" type="monster" looktype="334"/>
-</creatures>
+</creatures><?xml version="1.0" encoding="UTF-8"?>
