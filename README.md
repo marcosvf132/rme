@@ -9,6 +9,10 @@ This is a map editor for OpenTibia, which is an open source implementation of th
 You can find the project for hosting your own server at [the otserv project](https://github.com/opentibia/server).
 The main fansite for help, discussion and servers is [otland.net](http://otland.net).
 
+Preview
+========
+![1](https://user-images.githubusercontent.com/66353315/116692140-48679780-a992-11eb-90d3-86755548d649.gif)
+
 Download
 ========
 
