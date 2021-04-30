@@ -12,7 +12,9 @@ The main fansite for help, discussion and servers is [otland.net](http://otland.
 Download
 ========
 
-You can find official version releases at [remeres mapeditor website](http://remeresmapeditor.com/marklar.php).
+There is realeases available to downlaod the remeres ready-to-go. Just download and execute it. You can see the releases [here.](https://github.com/marcosvf132/rme/releases) (Version v4.+)
+
+For the not-edited remeres without my modifications you can find official version releases at [remeres mapeditor website](http://remeresmapeditor.com/marklar.php).
 
 Compiling
 =========
