@@ -61,6 +61,8 @@ GUI::GUI() :
 	secondary_map(nullptr),
 	doodad_buffer_map(nullptr),
 
+	area_brush(nullptr),
+	subarea_brush(nullptr),
 	house_brush(nullptr),
 	house_exit_brush(nullptr),
 	waypoint_brush(nullptr),
@@ -192,13 +194,13 @@ wxString GUI::GetLocalDirectory()
 		dir.Mkdir(0755, wxPATH_MKDIR_FULL);
 		return dir.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);;
 	} else {
-		FileName dir = dynamic_cast<wxStandardPaths&>(wxStandardPaths::Get()).GetUserDataDir();
+		FileName dir = dynamic_cast<wxStandardPaths&>(wxStandardPaths::Get()).GetExecutablePath();
 #ifdef __WINDOWS__
-		dir.AppendDir("Remere's Map Editor");
+		//dir.AppendDir("Remere's Map Editor");
 #else
 		dir.AppendDir(".rme");
 #endif
-		dir.Mkdir(0755, wxPATH_MKDIR_FULL);
+		//dir.Mkdir(0755, wxPATH_MKDIR_FULL);
 		return dir.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
 	}
 }
@@ -407,7 +409,7 @@ bool GUI::LoadDataFiles(wxString& error, wxArrayString& warnings)
 
 	g_gui.SetLoadDone(70, "Loading extensions...");
 	if(!g_materials.loadExtensions(extension_path, error, warnings)) {
-		//warnings.push_back("Couldn't load extensions: " + error);
+		warnings.push_back("Couldn't load extensions: " + error);
 	}
 
 	g_gui.SetLoadDone(70, "Finishing...");
@@ -1201,7 +1203,7 @@ void GUI::DestroyLoadBar()
 
 void GUI::ShowWelcomeDialog(const wxBitmap &icon) {
     std::vector<wxString> recent_files = root->GetRecentFiles();
-    welcomeDialog = newd WelcomeDialog(__W_RME_APPLICATION_NAME__, "Version " + __W_RME_VERSION__, root->FromDIP(wxSize(800, 480)), icon, recent_files);
+    welcomeDialog = newd WelcomeDialog(__W_RME_APPLICATION_NAME__, "MV edited version " + __W_RME_VERSION__, root->FromDIP(wxSize(800, 480)), icon, recent_files);
     welcomeDialog->Bind(wxEVT_CLOSE_WINDOW, &GUI::OnWelcomeDialogClosed, this);
     welcomeDialog->Bind(WELCOME_DIALOG_ACTION, &GUI::OnWelcomeDialogAction, this);
     welcomeDialog->Show();

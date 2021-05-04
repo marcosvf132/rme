@@ -23,6 +23,7 @@
 #include <fstream>
 #include <typeinfo>
 #include <memory>
+#include <google/protobuf/port_def.inc>
 
 class GamePanel : public wxPanel {
 public:
@@ -161,10 +162,16 @@ AboutWindow::AboutWindow(wxWindow* parent) :
 	wxDialog(parent, wxID_ANY, "About", wxDefaultPosition, wxSize(300, 320), wxRESIZE_BORDER | wxCAPTION | wxCLOSE_BOX),
 	game_panel(nullptr)
 {
+
+	std::ostringstream protoc;
+	int majorProtoc = std::floor(PROTOBUF_VERSION / 1000000);
+	int minorProtoc = std::floor((PROTOBUF_VERSION - (majorProtoc * 1000000)) / 1000);
+	int subProtoc = std::floor(PROTOBUF_VERSION - (majorProtoc * 1000000) - (minorProtoc * 1000));
+	protoc << majorProtoc << "." << minorProtoc << "." << subProtoc;
 	wxString about;
 
 	about << "This is an OpenTibia Map Editor created by Remere.\n";
-	about << "Version " << __W_RME_VERSION__ << " for ";
+	about << "Version " << __W_RME_VERSION__ << " (Edited by Marcosvf132, based on v3.7) for ";
 	about <<
 #ifdef __WINDOWS__
 		"Windows";
@@ -176,9 +183,13 @@ AboutWindow::AboutWindow(wxWindow* parent) :
 	"Unsupported OS";
 #endif
 	about << "\n\n";
+	about << "This version is a edited version from the original Remere map editor v3.7\n";
+	about << "To use the original program try downloading the newest version on Remere website.\n";
+	about << "\n\n";
 
 	about << "Using " << wxVERSION_STRING << " interface\n";
 	about << "OpenGL version " << wxString((char*)glGetString(GL_VERSION), wxConvUTF8) << "\n";
+	about << "Google protobuf version " << protoc.str() << "\n";
 	about << "\n";
 	about << "This program comes with ABSOLUTELY NO WARRANTY;\n";
 	about << "for details see the LICENSE file.\n";

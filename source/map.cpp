@@ -29,7 +29,8 @@ Map::Map() : BaseMap(),
 	houses(*this),
 	has_changed(false),
 	unnamed(false),
-	waypoints(*this)
+	waypoints(*this),
+	areas(*this)
 {
 	// Earliest version possible
 	// Caller is responsible for converting us to proper version

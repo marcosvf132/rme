@@ -96,6 +96,9 @@ BEGIN_EVENT_TABLE(MapCanvas, wxGLCanvas)
 	EVT_MENU(MAP_POPUP_MENU_SELECT_SPAWN_BRUSH, MapCanvas::OnSelectSpawnBrush)
 	EVT_MENU(MAP_POPUP_MENU_SELECT_HOUSE_BRUSH, MapCanvas::OnSelectHouseBrush)
 	// ----
+	EVT_MENU(MAP_POPUP_MENU_SELECT_AREA_BRUSH, MapCanvas::OnSelectAreaBrush)
+	EVT_MENU(MAP_POPUP_MENU_SELECT_SUBAREA_BRUSH, MapCanvas::OnSelectSubareaBrush)
+	// ----
 	EVT_MENU(MAP_POPUP_MENU_PROPERTIES, MapCanvas::OnProperties)
 	// ----
 	EVT_MENU(MAP_POPUP_MENU_BROWSE_TILE, MapCanvas::OnBrowseTile)
@@ -206,6 +209,8 @@ void MapCanvas::OnPaint(wxPaintEvent& event)
 			options.show_creatures = g_settings.getBoolean(Config::SHOW_CREATURES);
 			options.show_spawns = g_settings.getBoolean(Config::SHOW_SPAWNS);
 			options.show_houses = g_settings.getBoolean(Config::SHOW_HOUSES);
+			options.show_areas = g_settings.getBoolean(Config::SHOW_AREAS);
+			options.show_subareas = g_settings.getBoolean(Config::SHOW_SUBAREAS);
 			options.show_shade = g_settings.getBoolean(Config::SHOW_SHADE);
 			options.show_special_tiles = g_settings.getBoolean(Config::SHOW_SPECIAL_TILES);
 			options.show_items = g_settings.getBoolean(Config::SHOW_ITEMS);
@@ -2083,6 +2088,36 @@ void MapCanvas::OnSelectHouseBrush(wxCommandEvent& WXUNUSED(event))
 	}
 }
 
+void MapCanvas::OnSelectAreaBrush(wxCommandEvent& WXUNUSED(event))
+{
+	Tile* tile = editor.selection.getSelectedTile();
+	if (!tile)
+		return;
+
+	if (tile->isAreaTile()) {
+		Area* area = editor.map.areas.getArea(tile->getAreaID());
+		if (area) {
+			g_gui.area_brush->setArea(area);
+			g_gui.SelectBrush(g_gui.area_brush, TILESET_AREA);
+		}
+	}
+}
+
+void MapCanvas::OnSelectSubareaBrush(wxCommandEvent& WXUNUSED(event))
+{
+	Tile* tile = editor.selection.getSelectedTile();
+	if (!tile)
+		return;
+
+	if (tile->isSubareaTile()) {
+		Area* subarea = editor.map.areas.getArea(tile->getSubareaID());
+		if (subarea) {
+			g_gui.subarea_brush->setSubarea(subarea);
+			g_gui.SelectBrush(g_gui.subarea_brush, TILESET_AREA);
+		}
+	}
+}
+
 void MapCanvas::OnSelectCreatureBrush(wxCommandEvent& WXUNUSED(event))
 {
 	Tile* tile = editor.selection.getSelectedTile();
@@ -2354,6 +2389,12 @@ void MapPopupMenu::Update()
 				if(tile->isHouseTile())
 					Append(MAP_POPUP_MENU_SELECT_HOUSE_BRUSH, "Select House", "Draw with the house on this tile.");
 
+				if (tile->isAreaTile())
+					Append(MAP_POPUP_MENU_SELECT_AREA_BRUSH, "Select Area", "Draw with the area on this tile.");
+
+				if (tile->isSubareaTile())
+					Append(MAP_POPUP_MENU_SELECT_SUBAREA_BRUSH, "Select Subarea", "Draw with the subarea on this tile.");
+
 				AppendSeparator();
 				Append( MAP_POPUP_MENU_PROPERTIES, "&Properties", "Properties for the current object");
 			} else {
@@ -2374,6 +2415,14 @@ void MapPopupMenu::Update()
 
 				if(tile->isHouseTile()) {
 					Append(MAP_POPUP_MENU_SELECT_HOUSE_BRUSH, "Select House", "Draw with the house on this tile.");
+				}
+
+				if (tile->isAreaTile()) {
+					Append(MAP_POPUP_MENU_SELECT_AREA_BRUSH, "Select Area", "Draw with the area on this tile.");
+				}
+
+				if (tile->isSubareaTile()) {
+					Append(MAP_POPUP_MENU_SELECT_SUBAREA_BRUSH, "Select Subarea", "Draw with the subarea on this tile.");
 				}
 
 				if(tile->hasGround() || topCreature || topSpawn) {

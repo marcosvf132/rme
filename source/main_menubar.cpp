@@ -143,6 +143,8 @@ MainMenuBar::MainMenuBar(MainFrame *frame) : frame(frame)
 	MAKE_ACTION(SHOW_ONLY_COLORS, wxITEM_CHECK, OnChangeViewSettings);
 	MAKE_ACTION(SHOW_ONLY_MODIFIED, wxITEM_CHECK, OnChangeViewSettings);
 	MAKE_ACTION(SHOW_HOUSES, wxITEM_CHECK, OnChangeViewSettings);
+	MAKE_ACTION(SHOW_AREAS, wxITEM_CHECK, OnChangeViewSettings);
+	MAKE_ACTION(SHOW_SUBAREAS, wxITEM_CHECK, OnChangeViewSettings);
 	MAKE_ACTION(SHOW_PATHING, wxITEM_CHECK, OnChangeViewSettings);
 	MAKE_ACTION(SHOW_TOOLTIPS, wxITEM_CHECK, OnChangeViewSettings);
 	MAKE_ACTION(SHOW_PREVIEW, wxITEM_CHECK, OnChangeViewSettings);
@@ -161,6 +163,7 @@ MainMenuBar::MainMenuBar(MainFrame *frame) : frame(frame)
 	MAKE_ACTION(SELECT_ITEM, wxITEM_NORMAL, OnSelectItemPalette);
 	MAKE_ACTION(SELECT_CREATURE, wxITEM_NORMAL, OnSelectCreaturePalette);
 	MAKE_ACTION(SELECT_HOUSE, wxITEM_NORMAL, OnSelectHousePalette);
+	MAKE_ACTION(SELECT_AREA, wxITEM_NORMAL, OnSelectAreaPalette);
 	MAKE_ACTION(SELECT_WAYPOINT, wxITEM_NORMAL, OnSelectWaypointPalette);
 	MAKE_ACTION(SELECT_RAW, wxITEM_NORMAL, OnSelectRawPalette);
 
@@ -380,6 +383,7 @@ void MainMenuBar::Update()
 	EnableItem(SELECT_DOODAD, loaded);
 	EnableItem(SELECT_ITEM, loaded);
 	EnableItem(SELECT_HOUSE, loaded);
+	EnableItem(SELECT_AREA, loaded);
 	EnableItem(SELECT_CREATURE, loaded);
 	EnableItem(SELECT_WAYPOINT, loaded);
 	EnableItem(SELECT_RAW, loaded);
@@ -440,6 +444,8 @@ void MainMenuBar::LoadValues()
 	CheckItem(SHOW_AS_MINIMAP, g_settings.getBoolean(Config::SHOW_AS_MINIMAP));
 	CheckItem(SHOW_ONLY_COLORS, g_settings.getBoolean(Config::SHOW_ONLY_TILEFLAGS));
 	CheckItem(SHOW_ONLY_MODIFIED, g_settings.getBoolean(Config::SHOW_ONLY_MODIFIED_TILES));
+	CheckItem(SHOW_AREAS, g_settings.getBoolean(Config::SHOW_AREAS));
+	CheckItem(SHOW_SUBAREAS, g_settings.getBoolean(Config::SHOW_SUBAREAS));
 	CheckItem(SHOW_HOUSES, g_settings.getBoolean(Config::SHOW_HOUSES));
 	CheckItem(SHOW_PATHING, g_settings.getBoolean(Config::SHOW_BLOCKING));
 	CheckItem(SHOW_TOOLTIPS, g_settings.getBoolean(Config::SHOW_TOOLTIPS));
@@ -1842,6 +1848,8 @@ void MainMenuBar::OnChangeViewSettings(wxCommandEvent& event)
 	g_settings.setInteger(Config::SHOW_CREATURES, IsItemChecked(MenuBar::SHOW_CREATURES));
 	g_settings.setInteger(Config::SHOW_SPAWNS, IsItemChecked(MenuBar::SHOW_SPAWNS));
 	g_settings.setInteger(Config::SHOW_HOUSES, IsItemChecked(MenuBar::SHOW_HOUSES));
+	g_settings.setInteger(Config::SHOW_AREAS, IsItemChecked(MenuBar::SHOW_AREAS));
+	g_settings.setInteger(Config::SHOW_SUBAREAS, IsItemChecked(MenuBar::SHOW_SUBAREAS));
 	g_settings.setInteger(Config::HIGHLIGHT_ITEMS, IsItemChecked(MenuBar::HIGHLIGHT_ITEMS));
 	g_settings.setInteger(Config::SHOW_BLOCKING, IsItemChecked(MenuBar::SHOW_PATHING));
 	g_settings.setInteger(Config::SHOW_TOOLTIPS, IsItemChecked(MenuBar::SHOW_TOOLTIPS));
@@ -1892,6 +1900,11 @@ void MainMenuBar::OnSelectItemPalette(wxCommandEvent& WXUNUSED(event))
 void MainMenuBar::OnSelectHousePalette(wxCommandEvent& WXUNUSED(event))
 {
 	g_gui.SelectPalettePage(TILESET_HOUSE);
+}
+
+void MainMenuBar::OnSelectAreaPalette(wxCommandEvent& WXUNUSED(event))
+{
+	g_gui.SelectPalettePage(TILESET_AREA);
 }
 
 void MainMenuBar::OnSelectCreaturePalette(wxCommandEvent& WXUNUSED(event))

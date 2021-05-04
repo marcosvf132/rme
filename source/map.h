@@ -118,6 +118,7 @@ public:
 	Towns towns;
 	Houses houses;
 	Spawns spawns;
+	Areas areas;
 
 protected:
 	bool has_changed; // If the map has changed

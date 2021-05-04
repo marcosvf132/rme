@@ -110,6 +110,8 @@ namespace MenuBar
 		SHOW_ONLY_COLORS,
 		SHOW_ONLY_MODIFIED,
 		SHOW_HOUSES,
+		SHOW_AREAS,
+		SHOW_SUBAREAS,
 		SHOW_PATHING,
 		SHOW_TOOLTIPS,
 		SHOW_PREVIEW,
@@ -125,6 +127,7 @@ namespace MenuBar
 		SELECT_ITEM,
 		SELECT_CREATURE,
 		SELECT_HOUSE,
+		SELECT_AREA,
 		SELECT_WAYPOINT,
 		SELECT_RAW,
 		FLOOR_0,
@@ -266,6 +269,7 @@ public:
 	void OnSelectDoodadPalette(wxCommandEvent& event);
 	void OnSelectItemPalette(wxCommandEvent& event);
 	void OnSelectHousePalette(wxCommandEvent& event);
+	void OnSelectAreaPalette(wxCommandEvent& event);
 	void OnSelectCreaturePalette(wxCommandEvent& event);
 	void OnSelectWaypointPalette(wxCommandEvent& event);
 	void OnSelectRawPalette(wxCommandEvent& event);

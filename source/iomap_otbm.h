@@ -47,6 +47,7 @@ enum OTBM_ItemAttribute
 	OTBM_ATTR_SLEEPERGUID = 20,
 	OTBM_ATTR_SLEEPSTART = 21,
 	OTBM_ATTR_CHARGES = 22,
+	OTBM_ATTR_AREA = 23,
 
 	OTBM_ATTR_ATTRIBUTE_MAP = 128
 };
@@ -69,6 +70,8 @@ enum OTBM_NodeTypes_t
 	OTBM_HOUSETILE = 14,
 	OTBM_WAYPOINTS = 15,
 	OTBM_WAYPOINT = 16,
+	OTBM_AREAS = 17,
+	OTBM_AREA = 18,
 };
 
 struct OTBM_root_header
@@ -127,6 +130,7 @@ public:
 	virtual bool loadMap(Map& map, const FileName& identifier);
 	virtual bool saveMap(Map& map, const FileName& identifier);
 
+	virtual bool generateMapData(Map& map, const FileName& identifier);
 	virtual int getGeneratorHouseTilesJumps(int min_pos_x, int min_pos_y, int min_pos_z, int max_pos_x, int max_pos_y, int max_pos_z, Map& map);
 	virtual bool generateHouseData(Map& map, const FileName& identifier);
 

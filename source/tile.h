@@ -22,6 +22,7 @@
 #include "item.h"
 #include "map_region.h"
 #include <unordered_set>
+#include "areas.h"
 
 enum {
 	TILESTATE_NONE           = 0x0000,
@@ -54,6 +55,8 @@ public: // Members
 	Creature*      creature;
 	Spawn*         spawn;
 	uint32_t house_id; // House id for this tile (pointer not safe)
+	Area* area;
+	Area* subarea;
 
 public:
 	// ALWAYS use this constructor if the Tile is EVER going to be placed on a map
@@ -181,6 +184,12 @@ public: //Functions
 	// Carpetize (name sucks even worse than last one, I know) this tile
 	void carpetize(BaseMap* parent);
 
+	// Area
+	bool isAreaTile() const;
+	bool isSubareaTile() const;
+	uint32_t getAreaID() const;
+	uint32_t getSubareaID() const;
+
 	// Has to do with houses
 	bool isHouseTile() const;
 	uint32_t getHouseID() const;
@@ -191,6 +200,9 @@ public: //Functions
 	HouseExitList* getHouseExits();
 	bool hasHouseExit(uint32_t exit) const;
 	void setHouse(House* house);
+
+	void setArea(Area* area);
+	void setSubarea(Area* subarea);
 
 	// Mapflags (PZ, PVPZONE etc.)
 	void setMapFlags(uint16_t _flags);
@@ -235,8 +247,24 @@ inline bool Tile::isHouseTile() const {
 	return house_id != 0;
 }
 
+inline bool Tile::isAreaTile() const {
+	return area != nullptr;
+}
+
+inline bool Tile::isSubareaTile() const {
+	return area != nullptr && subarea != nullptr;
+}
+
 inline uint32_t Tile::getHouseID() const {
 	return house_id;
+}
+
+inline uint32_t Tile::getAreaID() const {
+	return area ? area->getID() : 0;
+}
+
+inline uint32_t Tile::getSubareaID() const {
+	return subarea ? subarea->getID() : 0;
 }
 
 inline HouseExitList* Tile::getHouseExits() {

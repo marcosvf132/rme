@@ -204,6 +204,8 @@ void Settings::IO(IOMode mode)
 	Int(SHOW_ITEMS, 1);
 	Int(HIGHLIGHT_ITEMS, 0);
 	Int(SHOW_CREATURES, 1);
+	Int(SHOW_AREAS, 1);
+	Int(SHOW_SUBAREAS, 1);
 	Int(SHOW_HOUSES, 1);
 	Int(SHOW_BLOCKING, 0);
 	Int(SHOW_TOOLTIPS, 1);

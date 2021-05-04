@@ -88,6 +88,9 @@ public:
 	void OnSelectSpawnBrush(wxCommandEvent& event);
 	void OnSelectHouseBrush(wxCommandEvent& event);
 	// ---
+	void OnSelectSubareaBrush(wxCommandEvent& event);
+	void OnSelectAreaBrush(wxCommandEvent& event);
+	// ---
 	void OnProperties(wxCommandEvent& event);
 
 	void Refresh();

@@ -89,4 +89,10 @@ enum DoorType {
 	WALL_HATCH_WINDOW,
 };
 
+enum AreaType_t {
+	undefined = 0,
+	area = 1,
+	subarea = 2,
+};
+
 #endif

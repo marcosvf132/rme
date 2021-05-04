@@ -30,6 +30,7 @@
 
 #include "house_brush.h"
 #include "map.h"
+#include "palette_area.h"
 
 // ============================================================================
 // Palette window
@@ -50,6 +51,7 @@ PaletteWindow::PaletteWindow(wxWindow* parent, const TilesetContainer& tilesets)
 	item_palette(nullptr),
 	creature_palette(nullptr),
 	house_palette(nullptr),
+	area_palette(nullptr),
 	waypoint_palette(nullptr),
 	raw_palette(nullptr)
 {
@@ -69,6 +71,9 @@ PaletteWindow::PaletteWindow(wxWindow* parent, const TilesetContainer& tilesets)
 
 	house_palette = static_cast<HousePalettePanel*>(CreateHousePalette(choicebook, tilesets));
 	choicebook->AddPage(house_palette, house_palette->GetName());
+
+	area_palette = static_cast<AreaPalettePanel*>(CreateAreaPalette(choicebook, tilesets));
+	choicebook->AddPage(area_palette, area_palette->GetName());
 
 	waypoint_palette = static_cast<WaypointPalettePanel*>(CreateWaypointPalette(choicebook, tilesets));
 	choicebook->AddPage(waypoint_palette, waypoint_palette->GetName());
@@ -147,6 +152,16 @@ PalettePanel* PaletteWindow::CreateHousePalette(wxWindow *parent, const TilesetC
 	return panel;
 }
 
+PalettePanel* PaletteWindow::CreateAreaPalette(wxWindow* parent, const TilesetContainer& tilesets)
+{
+	AreaPalettePanel* panel = newd AreaPalettePanel(parent);
+
+	BrushSizePanel* size_panel = newd BrushSizePanel(panel);
+	size_panel->SetToolbarIconSize(g_settings.getBoolean(Config::USE_LARGE_HOUSE_SIZEBAR));
+	panel->AddToolPanel(size_panel);
+	return panel;
+}
+
 PalettePanel* PaletteWindow::CreateWaypointPalette(wxWindow *parent, const TilesetContainer& tilesets)
 {
 	WaypointPalettePanel* panel = newd WaypointPalettePanel(parent);
@@ -185,6 +200,10 @@ void PaletteWindow::ReloadSettings(Map* map)
 		house_palette->SetMap(map);
 		house_palette->SetToolbarIconSize(g_settings.getBoolean(Config::USE_LARGE_HOUSE_SIZEBAR));
 	}
+	if (area_palette) {
+		area_palette->SetMap(map);
+		area_palette->SetToolbarIconSize(g_settings.getBoolean(Config::USE_LARGE_HOUSE_SIZEBAR));
+	}
 	if(waypoint_palette) {
 		waypoint_palette->SetMap(map);
 	}
@@ -222,6 +241,9 @@ void PaletteWindow::InvalidateContents()
 	}
 	if(house_palette) {
 		house_palette->OnUpdate();
+	}
+	if (area_palette) {
+		area_palette->OnUpdate();
 	}
 	if(waypoint_palette) {
 		waypoint_palette->OnUpdate();
@@ -275,6 +297,12 @@ bool PaletteWindow::OnSelectBrush(const Brush* whatbrush, PaletteType primary)
 	if(whatbrush->isHouse() && house_palette) {
 		house_palette->SelectBrush(whatbrush);
 		SelectPage(TILESET_HOUSE);
+		return true;
+	}
+
+	if (whatbrush->isArea() && area_palette) {
+		area_palette->SelectBrush(whatbrush);
+		SelectPage(TILESET_AREA);
 		return true;
 	}
 
@@ -396,6 +424,9 @@ void PaletteWindow::OnUpdate(Map* map)
 	}
 	if(house_palette) {
 		house_palette->SetMap(map);
+	}
+	if (area_palette) {
+		area_palette->SetMap(map);
 	}
 	if(waypoint_palette) {
 		waypoint_palette->SetMap(map);

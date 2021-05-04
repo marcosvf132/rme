@@ -47,6 +47,8 @@ class OptionalBorderBrush;
 class CreatureBrush;
 class SpawnBrush;
 class HouseBrush;
+class AreaBrush;
+class SubAreaBrush;
 class HouseExitBrush;
 class WaypointBrush;
 class FlagBrush;
@@ -135,6 +137,8 @@ public:
 	virtual bool isCreature() const { return false; }
 	virtual bool isSpawn() const { return false; }
 	virtual bool isHouse() const { return false; }
+	virtual bool isArea() const { return false; }
+	virtual bool isSubarea() const { return false; }
 	virtual bool isHouseExit() const { return false; }
 	virtual bool isWaypoint() const { return false; }
 	virtual bool isFlag() const { return false; }
@@ -153,6 +157,8 @@ public:
 	virtual CreatureBrush* asCreature() { return nullptr; }
 	virtual SpawnBrush* asSpawn() { return nullptr; }
 	virtual HouseBrush* asHouse() { return nullptr; }
+	virtual AreaBrush* asArea() { return nullptr; }
+	virtual SubAreaBrush* asSubarea() { return nullptr; }
 	virtual HouseExitBrush* asHouseExit() { return nullptr; }
 	virtual WaypointBrush* asWaypoint() { return nullptr; }
 	virtual FlagBrush* asFlag() { return nullptr; }

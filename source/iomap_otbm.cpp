@@ -44,6 +44,7 @@
 #include "house.h"
 #include <fstream>
 #include <iostream>
+#include "map.pb.h"
 
 typedef uint8_t attribute_t;
 typedef uint32_t flags_t;
@@ -155,6 +156,7 @@ bool Item::readItemAttribute_OTBM(const IOMap& maphandle, OTBM_ItemAttribute att
 		// will break horribly
 		case OTBM_ATTR_DEPOT_ID: return stream->skip(2);
 		case OTBM_ATTR_HOUSEDOORID: return stream->skip(1);
+		case OTBM_ATTR_AREA: return stream->skip(2);
 		case OTBM_ATTR_TELE_DEST: return stream->skip(5);
 		default: return false;
 	}
@@ -807,6 +809,41 @@ bool IOMapOTBM::loadMap(Map& map, NodeFileReadHandle& f)
 								tile->addItem(item);
 								break;
 							}
+							case OTBM_ATTR_AREA: {
+								// Area
+								uint16_t tilearea_id;
+								Area* tilearea = nullptr;
+								if (!tileNode->getU16(tilearea_id)) {
+									warning("Invalid tile area of tile on %d:%d:%d", pos.x, pos.y, pos.z);
+								}
+								if (tilearea_id && tilearea_id > 0) {
+									tilearea = map.areas.getArea(tilearea_id);
+									if (!tilearea) {
+										Area newtilearea;
+										newtilearea.setID(tilearea_id);
+										map.areas.addArea(newd Area(newtilearea));
+										tilearea = map.areas.getArea(tilearea_id);
+									}
+
+									tile->setArea(tilearea);
+									// Subarea (If exist)
+									uint16_t tilesubarea_id;
+									if (!tileNode->getU16(tilesubarea_id)) {
+										warning("Invalid tile subarea of tile on %d:%d:%d", pos.x, pos.y, pos.z);
+									}
+									if (tilesubarea_id && tilesubarea_id > 0) {
+										Area* tilesubarea = map.areas.getArea(tilesubarea_id);
+										if (!tilesubarea) {
+											Area newtilesubarea;
+											newtilesubarea.setID(tilesubarea_id);
+											map.areas.addArea(newd Area(newtilesubarea));
+											tilesubarea = map.areas.getArea(tilesubarea_id);
+										}
+										tile->setSubarea(tilesubarea);
+									}
+								}
+								break;
+							}
 							default: {
 								warning("Unknown tile attribute at %d:%d:%d", pos.x, pos.y, pos.z);
 								break;
@@ -924,6 +961,116 @@ bool IOMapOTBM::loadMap(Map& map, NodeFileReadHandle& f)
 				wp.pos.z = z;
 
 				map.waypoints.addWaypoint(newd Waypoint(wp));
+			}
+		} else if (node_type == OTBM_AREAS) {
+			for (BinaryNode* areaNode = mapNode->getChild(); areaNode != nullptr; areaNode = areaNode->advance()) {
+				Area* area = nullptr;
+				uint8_t areaload_type;
+				if (!areaNode->getByte(areaload_type)) {
+					warning("Invalid area type (1)");
+					continue;
+				}
+				if (areaload_type != OTBM_AREA) {
+					warning("Invalid area type (2)");
+					continue;
+				}
+
+				uint16_t area_id = 0;
+				if (!areaNode->getU16(area_id)) {
+					warning("Invalid area id");
+					continue;
+				}
+
+				area = map.areas.getArea(area_id);
+				if (!area) {
+					Area newarea;
+					newarea.setID(area_id);
+					map.areas.addArea(newd Area(newarea));
+					area = map.areas.getArea(area_id);
+				}
+
+				std::string area_name;
+				if (!areaNode->getString(area_name)) {
+					warning("Invalid area name");
+					continue;
+				}
+				area->setName(area_name);
+
+				std::string area_alias;
+				if (!areaNode->getString(area_alias)) {
+					warning("Invalid area alias name");
+					continue;
+				}
+				area->setAlias(area_alias);
+
+				uint8_t area_type = 0;
+				if (!areaNode->getU8(area_type)) {
+					warning("Invalid area type");
+					continue;
+				}
+				area->setType(static_cast<AreaType_t>(area_type));
+
+				uint16_t area_parent_id;
+				if (!areaNode->getU16(area_parent_id)) {
+					warning("Invalid parent area id");
+					continue;
+				}
+
+				if (area_parent_id &&  area_parent_id > 0) {
+					Area* mainArea = map.areas.getArea(area_parent_id);
+						if (!mainArea) {
+							Area newmainarea;
+								newmainarea.setID(area_parent_id);
+								map.areas.addArea(newd Area(newmainarea));
+								mainArea = map.areas.getArea(area_parent_id);
+						}
+						else {
+							area->setSubareaOn(mainArea); // Remake this one, change from ptr to int
+						}
+				}
+
+				uint8_t area_donate = 0;
+				if (!areaNode->getU8(area_donate)) {
+					warning("Invalid area donation bool");
+					continue;
+				}
+				area->setDonation(area_donate != 0);
+
+				uint16_t x;
+				uint16_t y;
+				uint8_t z;
+				if (!areaNode->getU16(x) || !areaNode->getU16(y) || !areaNode->getU8(z)) {
+					warning("Invalid area main position");
+					continue;
+				}
+				area->setMainPosition(Position(x, y, z));
+
+				uint16_t subarea_size;
+				if (!areaNode->getU16(subarea_size)) {
+					warning("Invalid area subarea size");
+					continue;
+				}
+				if (subarea_size && subarea_size > 0) {
+					for (int subarea_it = 1; subarea_it <= subarea_size; ++subarea_it) {
+						uint16_t subarea_id;
+						Area* subarea = nullptr;
+						if (!areaNode->getU16(subarea_id)) {
+							warning("Invalid area subarea id");
+							continue;
+						}
+						if (subarea_id) {
+							subarea = map.areas.getArea(subarea_id);
+							if (!subarea) {
+								Area newsubarea;
+								newsubarea.setID(subarea_id);
+								map.areas.addArea(newd Area(newsubarea));
+								subarea = map.areas.getArea(subarea_id);
+							}
+
+							subarea->setSubareaOn(area); // Remake this one, change from ptr to int
+						}
+					}
+				}
 			}
 		}
 	}
@@ -1150,6 +1297,60 @@ bool IOMapOTBM::loadHouses(Map& map, pugi::xml_document& doc)
 		}
 	}
 	return true;
+}
+
+bool IOMapOTBM::generateMapData(Map& map, const FileName& identifier)
+{
+	GOOGLE_PROTOBUF_VERIFY_VERSION;
+	protobuf::mapdata::MapData* mapData = new protobuf::mapdata::MapData();
+
+	// First lets begin with the npc part:
+	#pragma region Npc data insert
+	CreatureList preventDup;
+	for (const auto& spawnPosition : map.spawns) {
+		Tile* tile = map.getTile(spawnPosition);
+		if (tile == nullptr)
+			continue;
+
+		Spawn* spawn = tile->spawn;
+		ASSERT(spawn);
+		int32_t radius = spawn->getSize();
+		for (int32_t y = -radius; y <= radius; ++y) {
+			for (int32_t x = -radius; x <= radius; ++x) {
+				Tile* creature_tile = map.getTile(spawnPosition + Position(x, y, 0));
+				if (creature_tile) {
+					Creature* creature = creature_tile->creature;
+					if (creature && creature->isNpc() && !creature->isSaved()) {
+						// Create and insert on the main data
+						protobuf::mapdata::NpcData* npcData = mapData->add_npcdata();
+
+						// Name
+						npcData->set_name(creature->getName());
+
+						// Position
+						protobuf::mapdata::Position* npcPos = new protobuf::mapdata::Position();
+						npcPos->set_posx(creature_tile->getPosition().x);
+						npcPos->set_posy(creature_tile->getPosition().y);
+						npcPos->set_posz(creature_tile->getPosition().z);
+						npcData->set_allocated_position(npcPos);
+
+						// Subaarea
+						npcData->set_subareaid(0); // To-Do: Create subarea system
+						creature->save();
+						preventDup.push_back(creature);
+					}
+				}
+			}
+		}
+	}
+
+	// Reset the creature to prevent bugs when saving.
+	for (Creature* creature : preventDup) {
+		creature->reset();
+	}
+	#pragma endregion
+
+
 }
 
 int IOMapOTBM::getGeneratorHouseTilesJumps(int min_pos_x, int min_pos_y, int min_pos_z, int max_pos_x, int max_pos_y, int max_pos_z, Map& map)
@@ -1521,6 +1722,12 @@ bool IOMapOTBM::saveMap(Map& map, NodeFileWriteHandle& f)
 					f.addU32(save_tile->getMapFlags());
 				}
 
+				if (save_tile->isAreaTile()) {
+					f.addByte(OTBM_ATTR_AREA);
+					f.addU16(save_tile->getAreaID());
+					f.addU16(save_tile->getSubareaID());
+				}
+
 				if(save_tile->ground) {
 					Item* ground = save_tile->ground;
 					if(ground->isMetaItem()) {
@@ -1589,6 +1796,29 @@ bool IOMapOTBM::saveMap(Map& map, NodeFileWriteHandle& f)
 				}
 				f.endNode();
 			}
+
+			// Write areas and subareas
+			f.addNode(OTBM_AREAS);
+			for (Area* area : map.areas.areas) {
+				if (area) {
+					f.addNode(OTBM_AREA);
+						f.addU16(area->getID()); // Area ID
+						f.addString(area->getName()); // Area name
+						f.addString(area->getAlias()); // Area alias (AKA)
+						f.addU8(static_cast<uint8_t>(area->getType())); // Area type 'AreaType_t'
+						f.addU16(area->getParentArea() ? area->getParentArea()->getID() : 0); // Parent area ID (For subarea)
+						f.addU8(area->isDonation() ? 1 : 0); // Area donation system
+						f.addU16(area->getMainPosition().x);
+						f.addU16(area->getMainPosition().y);
+						f.addU8(area->getMainPosition().z);
+						f.addU16(area->getSubareas().size()); // Area subareas size
+						for (auto subareas_it : area->getSubareas()) // Area subareas IDs
+							f.addU16(subareas_it ? subareas_it->getID() : 0); // Area subarea ID
+
+					f.endNode();
+				}
+			}
+			f.endNode();
 		}
 		f.endNode();
 	}

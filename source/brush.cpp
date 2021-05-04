@@ -29,6 +29,7 @@
 #include "table_brush.h"
 #include "wall_brush.h"
 #include "waypoint_brush.h"
+#include "area_brush.h"
 
 #include "settings.h"
 
@@ -79,6 +80,8 @@ void Brushes::init()
 	addBrush(g_gui.quest_door_brush = newd DoorBrush(WALL_DOOR_QUEST));
 	addBrush(g_gui.hatch_door_brush = newd DoorBrush(WALL_HATCH_WINDOW));
 	addBrush(g_gui.window_door_brush = newd DoorBrush(WALL_WINDOW));
+	addBrush(g_gui.area_brush = newd AreaBrush());
+	addBrush(g_gui.subarea_brush = newd SubAreaBrush());
 	addBrush(g_gui.house_brush = newd HouseBrush());
 	addBrush(g_gui.house_exit_brush = newd HouseExitBrush());
 	addBrush(g_gui.waypoint_brush = newd WaypointBrush());

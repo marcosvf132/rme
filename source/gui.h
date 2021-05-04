@@ -29,6 +29,7 @@
 #include "map_tab.h"
 #include "palette_window.h"
 #include "client_version.h"
+#include "area_brush.h"
 
 class BaseMap;
 class Map;
@@ -380,6 +381,8 @@ public:
 	HouseBrush* house_brush;
 	HouseExitBrush* house_exit_brush;
 	WaypointBrush* waypoint_brush;
+	AreaBrush* area_brush;
+	SubAreaBrush* subarea_brush;
 	OptionalBorderBrush* optional_brush;
 	EraserBrush* eraser;
 	SpawnBrush* spawn_brush;

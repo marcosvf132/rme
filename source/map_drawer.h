@@ -61,6 +61,8 @@ struct DrawingOptions {
 	bool show_creatures;
 	bool show_spawns;
 	bool show_houses;
+	bool show_areas;
+	bool show_subareas;
 	bool show_shade;
 	bool show_special_tiles;
 	bool show_items;
@@ -87,6 +89,8 @@ class MapDrawer
 	float zoom;
 
 	uint32_t current_house_id;
+	uint32_t current_area_id;
+	uint32_t current_subarea_id;
 
 	int mouse_map_x, mouse_map_y;
 	int start_x, start_y, start_z;
@@ -150,6 +154,8 @@ protected:
 		COLOR_VALID,
 		COLOR_INVALID,
 		COLOR_BLANK,
+		COLOR_AREA_BRUSH,
+		COLOR_SUBAREA_BRUSH,
 	};
 
 	void getColor(Brush* brush, const Position& position, uint8_t &r, uint8_t &g, uint8_t &b);

@@ -19,6 +19,7 @@
 #define RME_PALETTE_H_
 
 #include "palette_common.h"
+#include "palette_area.h"
 
 class BrushPalettePanel;
 class CreaturePalettePanel;
@@ -66,6 +67,7 @@ protected:
 	static PalettePanel* CreateDoodadPalette(wxWindow* parent, const TilesetContainer& tilesets);
 	static PalettePanel* CreateItemPalette(wxWindow* parent, const TilesetContainer& tilesets);
 	static PalettePanel* CreateCreaturePalette(wxWindow* parent, const TilesetContainer& tilesets);
+	static PalettePanel* CreateAreaPalette(wxWindow* parent, const TilesetContainer& tilesets);
 	static PalettePanel* CreateHousePalette(wxWindow* parent, const TilesetContainer& tilesets);
 	static PalettePanel* CreateWaypointPalette(wxWindow* parent, const TilesetContainer& tilesets);
 	static PalettePanel* CreateRAWPalette(wxWindow* parent, const TilesetContainer& tilesets);
@@ -77,6 +79,7 @@ protected:
 	BrushPalettePanel* item_palette;
 	CreaturePalettePanel* creature_palette;
 	HousePalettePanel* house_palette;
+	AreaPalettePanel* area_palette;
 	WaypointPalettePanel* waypoint_palette;
 	BrushPalettePanel* raw_palette;
 

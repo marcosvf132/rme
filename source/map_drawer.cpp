@@ -60,6 +60,8 @@ void DrawingOptions::SetDefault()
 	show_creatures = true;
 	show_spawns = true;
 	show_houses = true;
+	show_areas = true;
+	show_subareas = true;
 	show_shade = true;
 	show_special_tiles = true;
 	show_items = true;
@@ -88,6 +90,8 @@ void DrawingOptions::SetIngame()
 	show_creatures = true;
 	show_spawns = false;
 	show_houses = false;
+	show_areas = false;
+	show_subareas = false;
 	show_shade = false;
 	show_special_tiles = false;
 	show_items = true;
@@ -232,7 +236,15 @@ void MapDrawer::DrawMap()
 
 	// The current house we're drawing
 	current_house_id = 0;
+	current_area_id = 0;
+	current_subarea_id = 0;
 	if(brush) {
+		if (brush->isArea())
+			current_area_id = brush->asArea()->getAreaID();
+		if (brush->isSubarea()) {
+			current_subarea_id = brush->asSubarea()->getSubareaID();
+			current_area_id = brush->asSubarea()->getAreaID();
+		}
 		if(brush->isHouse())
 			current_house_id = brush->asHouse()->getHouseID();
 		else if(brush->isHouseExit())
@@ -346,6 +358,32 @@ void MapDrawer::DrawMap()
 						// Draw ground
 						uint8_t r = 160, g = 160, b = 160;
 						if(tile->ground) {
+							if (tile->isSubareaTile() || tile->isAreaTile()) {
+								if (tile->isSubareaTile() && options.show_subareas) {
+									if ((int)tile->getSubareaID() == current_subarea_id) {
+										r = 185;
+										g = 101;
+										b = 255;
+									}
+									else {
+										r = 162;
+										g = 0;
+										b = 255;
+									}
+								}
+								else if (tile->isAreaTile() && options.show_areas) {
+									if ((int)tile->getAreaID() == current_area_id) {
+										r = 237;
+										g = 164;
+										b = 255;
+									}
+									else {
+										r = 224;
+										g = 96;
+										b = 255;
+									}
+								}
+							}
 							if(tile->isBlocking() && options.show_blocking) {
 								g = g/3*2;
 								b = b/3*2;
@@ -718,6 +756,8 @@ void MapDrawer::DrawBrush()
 	BrushColor brushColor = COLOR_BLANK;
 	if(brush->isTerrain() || brush->isTable() || brush->isCarpet())
 		brushColor = COLOR_BRUSH;
+	else if(brush->isArea())
+		brushColor = COLOR_AREA_BRUSH;
 	else if(brush->isHouse())
 		brushColor = COLOR_HOUSE_BRUSH;
 	else if(brush->isFlag())
@@ -1392,7 +1432,32 @@ void MapDrawer::DrawTile(TileLocation* location)
 
 		if(!as_minimap) {
 			bool showspecial = options.show_only_colors || options.show_special_tiles;
-
+			if (tile->isSubareaTile() || tile->isAreaTile()) {
+				if (tile->isSubareaTile() && options.show_subareas) {
+					if ((int)tile->getSubareaID() == current_subarea_id) {
+						r = 185;
+						g = 101;
+						b = 255;
+					}
+					else {
+						r = 162;
+						g = 0;
+						b = 255;
+					}
+				}
+				else if (tile->isAreaTile() && options.show_areas) {
+					if ((int)tile->getAreaID() == current_area_id) {
+						r = 237;
+						g = 164;
+						b = 255;
+					}
+					else {
+						r = 224;
+						g = 96;
+						b = 255;
+					}
+				}
+			}
 			if(options.show_blocking && tile->isBlocking() && tile->size() > 0) {
 				g = g / 3 * 2;
 				b = b / 3 * 2;
@@ -1414,7 +1479,6 @@ void MapDrawer::DrawTile(TileLocation* location)
 				g = uint8_t(g * f);
 				b = uint8_t(b * f);
 			}
-
 			if(options.show_houses && tile->isHouseTile()) {
 				if((int)tile->getHouseID() == current_house_id) {
 					r /= 2;
@@ -1769,6 +1833,8 @@ void MapDrawer::glColor(MapDrawer::BrushColor color)
 			);
 			break;
 
+		case COLOR_SUBAREA_BRUSH:
+		case COLOR_AREA_BRUSH:
 		case COLOR_FLAG_BRUSH:
 		case COLOR_HOUSE_BRUSH:
 			glColor4ub(

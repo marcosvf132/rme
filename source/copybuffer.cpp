@@ -79,6 +79,8 @@ void CopyBuffer::copy(Editor& editor, int floor)
 
 		if(tile->ground && tile->ground->isSelected()) {
 			copied_tile->house_id = tile->house_id;
+			if (tile->area)
+				copied_tile->area = tile->area;
 			copied_tile->setMapFlags(tile->getMapFlags());
 		}
 
@@ -138,7 +140,10 @@ void CopyBuffer::cut(Editor& editor, int floor)
 
 		if(tile->ground && tile->ground->isSelected()) {
 			copied_tile->house_id = newtile->house_id;
+			if (newtile->area)
+				copied_tile->area = newtile->area;
 			newtile->house_id = 0;
+			newtile->area = nullptr;
 			copied_tile->setMapFlags(tile->getMapFlags());
 			newtile->setMapFlags(TILESTATE_NONE);
 		}

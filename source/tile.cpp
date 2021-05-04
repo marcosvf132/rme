@@ -34,6 +34,8 @@ Tile::Tile(int x, int y, int z) :
 	ground(nullptr),
 	creature(nullptr),
 	spawn(nullptr),
+	area(nullptr),
+	subarea(nullptr),
 	house_id(0),
 	mapflags(0),
 	statflags(0),
@@ -47,6 +49,8 @@ Tile::Tile(TileLocation& loc) :
 	ground(nullptr),
 	creature(nullptr),
 	spawn(nullptr),
+	area(nullptr),
+	subarea(nullptr),
 	house_id(0),
 	mapflags(0),
 	statflags(0),
@@ -72,6 +76,14 @@ Tile* Tile::deepCopy(BaseMap& map)
 	Tile* copy = map.allocator.allocateTile(location);
 	copy->flags = flags;
 	copy->house_id = house_id;
+	if (area) {
+		copy->area = area;
+		area->addTile(copy);
+		if (subarea) {
+			copy->subarea = subarea;
+			subarea->addTile(copy);
+		}
+	}
 	if(spawn) copy->spawn = spawn->deepCopy();
 	if(creature) copy->creature = creature->deepCopy();
 	// Spawncount & exits are not transferred on copy!
@@ -126,6 +138,13 @@ void Tile::merge(Tile* other) {
 	if(other->house_id) {
 		house_id = other->house_id;
 	}
+	if (other->area) {
+		area = other->area;
+		if (other->subarea) {
+			subarea = other->subarea;
+		}
+	}
+
 
 	if(other->ground) {
 		delete ground;
@@ -627,6 +646,32 @@ void Tile::deselectGround()
 void Tile::setHouse(House* _house)
 {
 	house_id = (_house? _house->id : 0);
+}
+
+void Tile::setArea(Area* _area)
+{
+	if (area) {
+		area->removeTile(this);
+	}
+	if (_area) {
+		area = _area;
+		_area->addTile(this);
+		return;
+	}
+	area = nullptr;
+}
+
+void Tile::setSubarea(Area* _subarea)
+{
+	if (subarea) {
+		subarea->removeTile(this);
+	}
+	if (_subarea) {
+		subarea = _subarea;
+		_subarea->addTile(this);
+		return;
+	}
+	subarea = nullptr;
 }
 
 void Tile::addHouseExit(House* h)
